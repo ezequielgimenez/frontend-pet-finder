@@ -21,6 +21,11 @@ export function UserAuth() {
   const emailResult = useEmail(myEmail);
   const storage = JSON.parse(sessionStorage.getItem("user"));
 
+  window.scrollTo({
+    top: document.documentElement.scrollHeight,
+    behavior: "smooth",
+  });
+
   useEffect(() => {
     if (storage && storage.id) {
       navigate("/mis-datos");
