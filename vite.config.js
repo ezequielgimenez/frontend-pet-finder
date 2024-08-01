@@ -19,7 +19,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      "process.env": env,
+      // Solo si necesitas definir variables globales en `process.env`
+      "process.env": { ...env },
     },
   };
 });
