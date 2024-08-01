@@ -1,10 +1,18 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import dotenv from "dotenv";
+
+// Cargar variables de entorno desde el archivo .env
+dotenv.config();
 
 export default defineConfig(({ mode }) => {
-  // Cargar variables de entorno según el modo
-  const env = loadEnv(mode, process.cwd());
+  // Acceder a las variables de entorno cargadas
+  const env = {
+    VITE_TOKEN_MAPBOX: process.env.VITE_TOKEN_MAPBOX,
+    VITE_TOKEN_RESEND: process.env.VITE_TOKEN_RESEND,
+    VITE_API_BASE_URL: process.env.VITE_API_BASE_URL,
+  };
 
   return {
     plugins: [react()],
@@ -19,8 +27,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      // Solo si necesitas definir variables globales en `process.env`
-      "process.env": { ...env },
+      // Definir variables de entorno globalmente si es necesario
+      "process.env": env,
     },
   };
 });
