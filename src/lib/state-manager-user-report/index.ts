@@ -1,7 +1,7 @@
 // state de la info del usuario que reporta una mascota -- name, telefono, infoDelReporte
 import { atom, selector } from "recoil";
 
-const API_BASE_URL = "https://backend-pet-finder-kyyc.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const userDataReport = atom({
   key: "userDataReport",
