@@ -1,6 +1,5 @@
-Web App ----> https://pet-finder-21a3b.web.app/
-Web App para reportar y buscar mascotas perdidas cerca de tu ubicacion 
-
+# Web App
+[Pet Finder](https://pet-finder-21a3b.web.app/) - Web App para reportar y buscar mascotas perdidas cerca de tu ubicación.
 
 ## Tecnologías Utilizadas
 - **Frontend**:
@@ -13,7 +12,7 @@ Web App para reportar y buscar mascotas perdidas cerca de tu ubicacion
   - [Sequelize](https://sequelize.org/) - ORM para manejar la base de datos.
 
 - **Base de Datos**:
-  - [Railway]([(https://railway.app/)](https://railway.app/))) - Base de datos SQL distribuida.
+  - [Railway](https://railway.app/) - Plataforma para desplegar y gestionar bases de datos SQL distribuidas.
 
 - **Herramientas de Desarrollo**:
   - [ESLint](https://eslint.org/) - Herramienta para mantener la calidad del código.
@@ -22,8 +21,8 @@ Web App para reportar y buscar mascotas perdidas cerca de tu ubicacion
 
 - **Servicios de Hosting**:
   - [Firebase Hosting](https://firebase.google.com/products/hosting) - Hosting para la web app frontend.
-  - [Render]((https://render.com/)) - Despliegue del backend Express.
+  - [Render](https://render.com/) - Despliegue del backend Express.
 
 - **APIs**:
-  - [Mapbox GL REACT]((https://docs.mapbox.com/help/tutorials/use-mapbox-gl-js-with-react/)) - API para busquedas en el mapa.
-  - [Resend Email]((https://resend.com/emails)) - API para enviar mail.
+  - [Mapbox GL REACT](https://docs.mapbox.com/help/tutorials/use-mapbox-gl-js-with-react/) - API para búsquedas en el mapa.
+  - [Resend Email](https://resend.com/emails) - API para enviar emails.
