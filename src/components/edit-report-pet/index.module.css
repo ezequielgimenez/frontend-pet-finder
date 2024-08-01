@@ -1,0 +1,54 @@
+.mainContainer {
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.formMain {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.contentInput {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.contentInput label {
+  margin-bottom: 8px;
+  color: #333;
+  text-align: left;
+}
+
+.imgDropzone {
+  max-width: 300px;
+  height: 300px;
+  cursor: pointer;
+}
+
+.mapa {
+  max-width: 450px;
+}
+
+.labelMap {
+  margin-bottom: 0;
+}
+
+.contentButton {
+  margin: 20px 0;
+}
+
+@media (max-width: 390px) {
+  .formMain {
+    max-width: 300px;
+    padding: 10px;
+  }
+  .mapa {
+    max-width: 300px;
+  }
+  .imgDropzone {
+    max-width: 280px;
+  }
+}

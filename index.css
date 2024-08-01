@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(179.17deg, #ffffff 0%, #e6f4f1 100%);
+  font-family: Poppins;
+  font-weight: 400;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}

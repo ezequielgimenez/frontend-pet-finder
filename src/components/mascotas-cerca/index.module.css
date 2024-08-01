@@ -1,0 +1,64 @@
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-top: 40px;
+}
+
+.contentCard {
+  margin: 15px 0;
+}
+
+.contentButton {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px;
+}
+
+.contentReport {
+  background-color: #26302e;
+  border-radius: 10px;
+}
+
+.reportOn {
+  display: block;
+  position: absolute;
+  top: 5%;
+  z-index: 10;
+}
+
+.reportOff {
+  display: none;
+}
+
+.titleReport {
+  color: white;
+}
+
+.mainForm {
+  max-width: 400px;
+  margin: 0 auto; /* Centra el formulario horizontalmente */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+}
+
+.contentInput {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.contentInput label {
+  color: white;
+  text-align: left;
+}
+
+.myTextArea {
+  width: 277px;
+  height: 131px;
+  background-color: #4a5553;
+  color: white;
+}

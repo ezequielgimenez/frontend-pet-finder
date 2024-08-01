@@ -1,0 +1,127 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #26302e;
+  height: 100px;
+  border-radius: 0 0 10px 10px; /* Radio en las esquinas superiores */
+}
+
+.containerImg {
+  padding: 0 25px;
+  cursor: pointer;
+}
+
+.imgHeader {
+  width: 186px;
+}
+
+.containerLogo {
+  padding-top: 35px;
+  cursor: pointer;
+}
+
+.burger {
+  font-size: 35px;
+  color: white;
+}
+
+.burger:hover {
+  color: #ffa600;
+}
+
+.containerLinks {
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #26302e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: height 0.3s ease, opacity 0.3s ease;
+  height: 0;
+  opacity: 0;
+  padding: 15px 0;
+}
+
+.open {
+  height: auto;
+  opacity: 1;
+}
+
+.closed {
+  height: 0;
+  opacity: 0;
+}
+
+.contenedorNav {
+  display: flex;
+  flex-direction: column;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #777;
+}
+
+.divRegister {
+  display: flex;
+  flex-direction: column;
+  margin: 40px 0;
+}
+
+.referencia {
+  padding: 35px;
+  text-decoration: none;
+  color: white;
+}
+
+.referencia:hover {
+  color: #3b97d3;
+}
+
+.navs {
+  padding: 35px;
+  text-decoration: none;
+  color: white;
+}
+
+.navs:hover {
+  color: #ffa600;
+}
+
+.active {
+  color: #ffa600;
+}
+
+.cerrarSesion {
+  margin-top: 20px;
+}
+.cerrarSesion a {
+  color: #3b97d3;
+  padding-bottom: 20px;
+}
+
+.fullWindow {
+  display: none;
+}
+
+@media (min-width: 1366px) {
+  .containerLinks {
+    display: flex;
+    flex-direction: column;
+  }
+  .fullWindow {
+    display: flex;
+    margin-left: 400px;
+  }
+}

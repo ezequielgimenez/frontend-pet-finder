@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "outDir": "dist",
+    "baseUrl": "./src",
+    "types": ["vite/client"],
+    "paths": {
+      "lib/*": ["lib/*"],
+      "hooks/*": ["hooks/*"],
+      "ui/*": ["ui/*"],
+      "pages/*": ["pages/*"],
+      "components/*": ["components/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

@@ -1,0 +1,70 @@
+.subContent {
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.imgRegister {
+  width: 240px;
+  height: 210px;
+}
+
+.contentTitle {
+  margin-top: 40px;
+  margin-bottom: 50px;
+  padding: 0 25px;
+}
+
+.mainForm {
+  max-width: 400px;
+  margin: 0 auto; /* Centra el formulario horizontalmente */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+}
+
+/* contentInput: Estilo para los contenedores de cada campo */
+.contentInput {
+  margin-bottom: 20px; /* Espacio entre los campos */
+  display: flex;
+  flex-direction: column;
+}
+
+.contentSesion {
+  padding: 15px 0;
+}
+
+/* Labels de los inputs */
+.contentInput label {
+  margin-bottom: 8px; /* Espacio debajo del label */
+  color: #333; /* Color de texto */
+  text-align: left; /* Alinea el texto a la izquierda */
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+.containerButton {
+  margin-bottom: 30px;
+}
+
+.mainForm a {
+  color: #007bff; /* Color azul para el enlace */
+  text-decoration: none;
+}
+
+.mainForm a:hover {
+  text-decoration: underline; /* Subraya el enlace al pasar el ratón */
+}
+
+@media (max-width: 600px) {
+  .mainForm {
+    max-width: 300px;
+
+    padding: 10px;
+  }
+}

@@ -1,0 +1,15 @@
+.main {
+  max-width: 400px;
+  margin: 50px auto;
+}
+
+.title {
+  margin: 40px 0;
+}
+
+@media (max-width: 600px) {
+  .main {
+    max-width: 300px;
+    padding: 10px;
+  }
+}

@@ -1,0 +1,28 @@
+.containerMain {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.containerTitle {
+  max-width: 700px;
+}
+
+.containerTitle h1 {
+  color: #ffa600;
+  padding-bottom: 30px;
+}
+
+.containerTitle p {
+  padding: 0 15px;
+}
+
+.containerButton {
+  padding: 30px 0;
+}
+
+.imgAbout {
+  width: 400px;
+}

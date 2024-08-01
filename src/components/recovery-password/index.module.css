@@ -1,0 +1,28 @@
+.formMain {
+  max-width: 400px;
+  margin: 0 auto; /* Centra el formulario horizontalmente */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.mainInput {
+  display: flex;
+  flex-grow: 1;
+  margin: 40px 0;
+}
+
+.myInput {
+  flex-grow: 1;
+  max-width: 600px;
+  height: 50px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.4s ease-in-out;
+}
+
+.red {
+  color: red;
+}
+.green {
+  color: green;
+}
