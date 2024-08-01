@@ -13,9 +13,6 @@ import { emailAtom } from "lib/state-auth-email";
 import { useEmail } from "hooks/auth-email";
 
 export function UserAuth() {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const MAPBOX_TOKEN = import.meta.env.VITE_TOKEN_MAPBOX;
-
   const navigate = useNavigate();
   const [myEmail, setEmail] = useRecoilState(emailAtom);
   const [messageOk, setMessageOk] = useState("");
@@ -23,9 +20,6 @@ export function UserAuth() {
 
   const emailResult = useEmail(myEmail);
   const storage = JSON.parse(sessionStorage.getItem("user"));
-
-  console.log("api", API_BASE_URL);
-  console.log("api mapbox", MAPBOX_TOKEN);
 
   useEffect(() => {
     if (storage && storage.id) {
