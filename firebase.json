@@ -4,10 +4,6 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/verify-email/**",
-        "destination": "https://be-pet-finder.onrender.com/"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }
