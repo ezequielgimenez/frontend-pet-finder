@@ -13,7 +13,7 @@ Web App para reportar y buscar mascotas perdidas cerca de tu ubicacion
   - [Sequelize](https://sequelize.org/) - ORM para manejar la base de datos.
 
 - **Base de Datos**:
-  - [Railway]((https://railway.app/)) - Base de datos SQL distribuida.
+  - [Railway]([(https://railway.app/)](https://railway.app/))) - Base de datos SQL distribuida.
 
 - **Herramientas de Desarrollo**:
   - [ESLint](https://eslint.org/) - Herramienta para mantener la calidad del código.
