@@ -22,11 +22,13 @@ export function MyHeader() {
     <div>
       <header className={style.header}>
         <div className={style.containerLogo}>
-          <img
-            className={style.imgHeader}
-            src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1720029351/Pet%20Finder%20React/doarll8qp9gwzkixqcdt.png"
-            alt=""
-          />
+          <a href="/">
+            <img
+              className={style.imgHeader}
+              src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1720029351/Pet%20Finder%20React/doarll8qp9gwzkixqcdt.png"
+              alt=""
+            />
+          </a>
         </div>
 
         <div
