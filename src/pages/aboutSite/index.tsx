@@ -16,7 +16,7 @@ export function AboutSite() {
   return (
     <>
       <Helmet>
-        <title>Pet Finder - ABout</title>
+        <title>Pet Finder - About</title>
         <meta
           name="description"
           content="Conoce más sobre Pet Finder, la aplicación que te ayuda a encontrar mascotas perdidas cerca de tu ubicación."
