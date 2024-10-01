@@ -26,8 +26,11 @@ export function MyHeader() {
             <img
               className={style.imgHeader}
               src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1720029351/Pet%20Finder%20React/doarll8qp9gwzkixqcdt.png"
-              alt=""
+              alt="Logo de Pet Finder"
             />
+            <span style={{ display: "none" }}>
+              Volver a la página principal
+            </span>
           </a>
         </div>
 
