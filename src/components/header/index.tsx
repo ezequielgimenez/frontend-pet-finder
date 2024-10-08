@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import * as style from "./header.module.css";
-import { HeaderForFullWindows } from "./headerFullW";
+import { HeaderForFullWindows } from "./headerDesktop";
 
 export function MyHeader() {
   const [showNav, setShowNav] = useState(false);
