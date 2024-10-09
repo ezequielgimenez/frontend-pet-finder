@@ -47,7 +47,7 @@ export function MyHeader() {
               <a className={style.referencia} href="/mis-datos">
                 Mis Datos
               </a>
-              <a className={style.referencia} href="mis-reportes">
+              <a className={style.referencia} href="/mis-reportes">
                 Mis mascotas reportadas
               </a>
               <a className={style.referencia} href="/report-pet">
