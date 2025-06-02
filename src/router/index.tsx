@@ -31,8 +31,8 @@ export function AppRoutes() {
         <Route index element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/about" element={<AboutSite />} />
-        <Route path="/signIn" element={<LoginPage />} />
-        <Route path="/signUp" element={<RegisterPage />} />
+        <Route path="/signin" element={<LoginPage />} />
+        <Route path="/signup" element={<RegisterPage />} />
         <Route path="/signup/step-two" element={<RegisterPageTwo />} />
         <Route path="/mis-datos" element={<MisDatos />} />
         <Route path="/edit-data" element={<EditDataPage />} />

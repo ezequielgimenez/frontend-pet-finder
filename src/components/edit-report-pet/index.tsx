@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import * as style from "./index.module.css";
+import { toast } from "react-toastify";
+import style from "./index.module.css";
 
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
@@ -10,38 +10,25 @@ import { MyButton } from "ui/button/button";
 import { useDropzone } from "react-dropzone";
 
 // Mapbox
-import Map, { Marker } from "react-map-gl";
+import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // Fetch setLatLong
 import { setLongLat } from "lib/data-fetchs";
 
-//atom pet state manager
-import { petDataState } from "lib/state-manager-pets";
-import { deleteState } from "lib/state-manager-pets";
-//custom hook
-import { useEditReport } from "hooks/pet-hooks";
-import { useDeleteReport } from "hooks/pet-hooks";
+import { useUpdatePet, useDeletePet } from "hooks/pet-hooks";
 
 export function EditReportPet() {
   //// resources
   const navigate = useNavigate();
   const petStorage = JSON.parse(sessionStorage.getItem("pet"));
-  const storage = JSON.parse(sessionStorage.getItem("user"));
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
-  //// state's
-  const [pet, setPet] = useRecoilState(petDataState);
-  const [idPet, setIdPet] = useRecoilState(deleteState);
+  const { update, responseUpdate } = useUpdatePet();
+  const { eliminate, responseDelete } = useDeletePet();
+
   const [imageSrc, setImageSrc] = useState("");
-
-  const [namePet, setNamePet] = useState("");
   const [location, setLocation] = useState("");
-  const [saved, setSaved] = useState("");
-  const [eliminar, setEliminar] = useState("");
-
-  //// custom hooks
-  const response = useEditReport(pet);
-  const deleted = useDeleteReport(pet.idPet);
 
   //// Estado para manejar la vista del mapa y marcador
   const [viewState, setViewState] = React.useState({
@@ -55,77 +42,102 @@ export function EditReportPet() {
   });
 
   useEffect(() => {
-    if (!storage) {
-      navigate("/signin");
-    } else if (!storage.id) {
+    if (!userStorage.id && !petStorage.id) {
       navigate("/signin");
     }
+    return () => {
+      sessionStorage.setItem("pet", JSON.stringify({}));
+    };
   }, []);
 
   useEffect(() => {
-    if (response) {
-      if (response.success) {
-        navigate("/report-success");
+    if (responseUpdate) {
+      if (responseUpdate.success) {
+        toast.success(responseUpdate.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/mis-reportes"),
+        });
       } else {
-        navigate("/report-error");
+        toast.error(responseUpdate.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/mis-reportes"),
+        });
       }
     }
-  });
-
-  const handleSendData = (e) => {
-    e.preventDefault();
-    setPet((prevState) => {
-      const newState = {
-        ...prevState,
-        idPet: petStorage ? petStorage.id : 0,
-        namePet,
-        petUbicacion: location,
-        petImageUrl: imageSrc,
-        estadoPet: "perdido",
-        petLat: markerPosition.latitude,
-        petLong: markerPosition.longitude,
-      };
-      return newState;
-    });
-  };
-
-  const handleDeleted = () => {
-    setIdPet(petStorage ? petStorage.id : 0);
-  };
+  }, [responseUpdate]);
 
   useEffect(() => {
-    if (deleted) {
-      if (deleted.success) {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: "smooth",
+    if (responseDelete) {
+      if (responseDelete.success) {
+        toast.success(responseDelete.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/mis-reportes"),
         });
-        setEliminar("Reporte eliminado ✔️ redirigiendo..");
-        setTimeout(() => {
-          navigate("/mis-reportes");
-        }, 3000);
       } else {
-        setEliminar(deleted.message);
+        toast.error(responseDelete.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/mis-reportes"),
+        });
       }
     }
-  }, [deleted]);
+  }, [responseDelete]);
 
-  const handleNameForm = async (e) => {
+  const handleSendData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const name = e.target.name.value;
-    setSaved("Guardado ✔️");
-    setTimeout(() => {
-      setSaved("");
-    }, 3000);
+    const form = new FormData(e.currentTarget);
+    const name = form.get("name").toString();
+    const ubication = form.get("ubication").toString();
+    update({
+      id: petStorage.id,
+      name,
+      imageUrl: imageSrc,
+      ubication,
+      state: "perdido",
+      lat: markerPosition.latitude,
+      long: markerPosition.longitude,
+    });
+    e.currentTarget.reset();
+  };
 
-    setNamePet(name);
+  const handleDeleteConfirm = () => {
+    toast.info(
+      <div>
+        <p>¿Estás seguro que querés eliminar este reporte?</p>
+        <div>
+          <MyButton
+            color="rojo"
+            onClick={() => {
+              eliminate({ id: petStorage.id });
+              toast.dismiss();
+            }}
+          >
+            Sí, eliminar
+          </MyButton>
+        </div>
+
+        <div style={{ margin: "20px 0" }}>
+          <MyButton
+            color="negro"
+            onClick={() => {
+              toast.dismiss();
+            }}
+          >
+            Cancelar
+          </MyButton>
+        </div>
+      </div>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+        position: "top-center",
+        toastId: "confirm-delete",
+      }
+    );
   };
 
   const handleSearchForm = async (e) => {
     e.preventDefault();
-    const ubicacion = e.target.ubicacion.value;
-    setLocation(ubicacion);
-    const data = await setLongLat(ubicacion);
+    const data = await setLongLat(location);
     setViewState({
       longitude: data.long,
       latitude: data.lat,
@@ -146,7 +158,7 @@ export function EditReportPet() {
       ...prevState,
       longitude: lng,
       latitude: lat,
-      zoom: 15, // Ajusta el zoom como desees
+      zoom: 15,
     }));
   };
 
@@ -161,54 +173,66 @@ export function EditReportPet() {
       reader.readAsDataURL(file); // Lee el archivo como una URL
     });
   }, []);
+
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
     <div>
-      <div className={style.mainContainer}>
-        <h1>Editar Reporte de Mascota</h1>
+      <div className={style.formMain}>
+        <h1>
+          Editar o eliminar reporte de{" "}
+          {petStorage ? petStorage.name : "Mascota"}
+        </h1>
 
-        <div className={style.formMain}>
-          <form onSubmit={handleNameForm}>
-            <div className={style.contentInput}>
-              <label>Nombre de la mascota</label>
-              <MyInput type="text" name="name"></MyInput>
-            </div>
-
-            <div className={style.contentInput}>
-              <img src="" alt="" />
-              <div>{saved}</div>
-              <MyButton color="azul">Guardar</MyButton>
-            </div>
-          </form>
-
-          <div className="mapa"></div>
-
-          <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <img
-              className={style.imgDropzone}
-              src={
-                imageSrc ||
-                "https://res.cloudinary.com/dkzmrfgus/image/upload/v1720653028/Pet%20Finder%20React/Load%20Image/kewox0qmz3upro4rhwnq.png"
-              }
-              alt=""
-            />
+        <form onSubmit={handleSendData}>
+          <div className={style.contentInput}>
+            <label>Nombre de la mascota</label>
+            <MyInput type="text" name="name"></MyInput>
           </div>
-          <form onSubmit={handleSearchForm}>
-            <div className={style.contentInput}>
-              <label>Ubicación Ciudad - Provincia</label>
-              <MyInput type="text" name="ubicacion"></MyInput>
-            </div>
 
-            <div className={style.contentButton}>
-              <MyButton color="azul">Buscar</MyButton>
-            </div>
-          </form>
+          <div
+            {...getRootProps()}
+            style={{
+              border: "2px dashed #999",
+              padding: "20px",
+              textAlign: "center",
+              borderRadius: "10px",
+              backgroundColor: "#f9f9f9",
+              cursor: "pointer",
+              width: "300px",
+              margin: "auto",
+            }}
+          >
+            <input {...getInputProps()} />
+            {imageSrc ? (
+              <img className={style.imgDropzone} src={imageSrc} alt="" />
+            ) : (
+              <p>
+                Arrastre una imagen y suelte aquí o haz click y selecciona una
+                (Hasta 10mb)
+              </p>
+            )}
+          </div>
+          <div className={style.contentInput}>
+            <label>Ciudad - Provincia</label>
+            <MyInput
+              type="text"
+              name="ubication"
+              onChange={(e) => {
+                setLocation(e.target.value);
+              }}
+            ></MyInput>
+          </div>
+
+          <div onClick={handleSearchForm} className={style.contentButton}>
+            <MyButton type="button" color="azul">
+              Buscar
+            </MyButton>
+          </div>
+
           <div className={`${style.contentInput} ${style.labelMap}`}>
             <label>Seleccionar un punto en el mapa</label>
           </div>
-
           <Map
             mapboxAccessToken={import.meta.env.VITE_TOKEN_MAPBOX}
             onClick={handleMapClick}
@@ -229,18 +253,20 @@ export function EditReportPet() {
             </Marker>
           </Map>
 
-          <div onClick={handleSendData} className={style.contentButton}>
+          <div onClick={() => {}} className={style.contentButton}>
             <MyButton color="azul">Guardar</MyButton>
           </div>
+        </form>
+        <div className={style.contentButton}>
+          <MyButton type="button" onClick={handleDeleteConfirm} color="rojo">
+            Eliminar reporte
+          </MyButton>
+        </div>
 
-          <div onClick={handleDeleted} className={style.contentButton}>
-            <MyButton color="rojo">Eliminar reporte</MyButton>
-          </div>
-          <div>{eliminar}</div>
-
-          <div className={style.contentButton}>
-            <MyButton color="negro">Volver</MyButton>
-          </div>
+        <div className={style.contentButton}>
+          <MyButton onClick={() => navigate("/mis-reportes")} color="negro">
+            Volver
+          </MyButton>
         </div>
       </div>
     </div>

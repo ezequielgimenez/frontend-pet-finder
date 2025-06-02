@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import * as style from "./index.module.css";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import style from "./index.module.css";
 
 //ui
 import { Card } from "ui/card";
@@ -8,42 +11,34 @@ import { MyButton } from "ui/button/button";
 
 //hook
 import { useGetMyPets } from "hooks/pet-hooks";
-import { queryState } from "lib/state-manager-pets";
-import { useRecoilState } from "recoil";
-import { useNavigate } from "react-router-dom";
 
 export function MyReports() {
+  const navigate = useNavigate();
+
   const [showForm, setShowForm] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [results, setResults] = useState([]);
-  const [userId, setUserId] = useRecoilState(queryState);
-  const navigate = useNavigate();
+  const [userId, setUserId] = useState(null);
   const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
-  const response = useGetMyPets();
+  const response = useGetMyPets(userId);
 
   useEffect(() => {
-    if (!userStorage) {
-      navigate("/signin");
-    } else if (!userStorage.id) {
-      navigate("/signin");
+    if (userStorage && userStorage.id) {
+      setUserId({
+        userId: userStorage.id,
+      });
     }
   }, []);
 
   useEffect(() => {
-    if (userStorage) {
-      setUserId(userStorage.id);
-    }
-  });
-
-  useEffect(() => {
-    if (response && response.success) {
-      if (Array.isArray(response.data.myPets)) {
-        setResults(response.data.myPets);
+    if (response) {
+      if (response.success) {
+        setShowCard(!showCard);
+        setResults(response.data);
       } else {
-        console.error("Expected an array but got", response.data);
+        toast.error(response.message);
       }
-      setShowCard(true);
     }
   }, [response]);
 
@@ -51,12 +46,11 @@ export function MyReports() {
     setShowForm(!showForm);
   };
 
-  const handleCardClick = (id, namePet) => {
-    setShowForm(!showForm);
+  const handleCardClick = (id, name) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // console.log(`Clicked Card with ID: ${id} and Title: ${namePet}`);
     const newObject = {
       id,
+      name,
     };
     sessionStorage.setItem("pet", JSON.stringify(newObject));
     navigate("/edit-report");
@@ -76,20 +70,27 @@ export function MyReports() {
               alt=""
             />
           </div>
+          <div style={{ margin: "25px 0" }}>
+            <MyButton color="azul" onClick={() => navigate("/report-pet")}>
+              Crear un reporte de mascota
+            </MyButton>
+          </div>
         </div>
       </div>
       <div className={`${showCard ? style.cardOn : style.cardOff}`}>
-        {results.length > 0
+        {results
           ? results.map((item) => (
               <div className={style.contentCard} key={item.id}>
                 <Card
                   id={item.id}
-                  imgSrc={item.petImageUrl}
-                  title={item.namePet}
-                  description={item.petUbicacion}
+                  imgSrc={item.imageUrl}
+                  title={item.name}
+                  description={item.ubication}
                   textButton="Editar"
                   color="azul"
-                  sendData={handleCardClick}
+                  sendData={() => {
+                    handleCardClick(item.id, item.name);
+                  }}
                 />
               </div>
             ))

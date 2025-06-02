@@ -1,91 +1,107 @@
 import React, { useEffect } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import isequal from "lodash.isequal";
 
-//state main
-import { userDataState } from "lib/state-manager-user"; //atom
+//hooks atom
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
-//selectors fetch's
-import { userRegister } from "lib/state-manager-user"; //selector
-import { userUpdate } from "lib/state-manager-user"; //selector
-import { userUpdatePassword } from "lib/state-manager-user";
-import { userAuthToken } from "lib/state-manager-user"; //selector
-import { userLogin } from "lib/state-manager-user";
-import { mascotasCercas } from "lib/state-manager-user";
+//atom y derivados
+import {
+  userDataAtom,
+  userAtomLogin,
+  tokenAtom,
+  //derivados
+  registerDerived,
+  loginDerived,
+  tokenDerived,
+  updateDerived,
+  updatePassDerived,
+  recoveryPassword,
+  resetPassword,
+} from "lib/atom-auth-user";
 
-export function useRegister(data) {
-  const [user, setUser] = useRecoilState(userDataState);
-  const userData = useRecoilValue(userRegister);
+export function useRegister(userData) {
+  const [user, setUser] = useAtom(userDataAtom);
+  const results = useAtomValue(registerDerived);
 
   useEffect(() => {
-    if (data && data !== user) {
-      setUser(data);
+    if (userData && !isequal(userData, user)) {
+      setUser((prev) => ({
+        ...prev,
+        ...userData,
+      }));
+    }
+  }, [userData]);
+
+  return results;
+}
+
+export function useLogin(data) {
+  const [emailPassword, setEmailPassword] = useAtom(userAtomLogin);
+  const results = useAtomValue(loginDerived);
+
+  useEffect(() => {
+    if (data && !isequal(data, emailPassword)) {
+      setEmailPassword(data);
     }
   }, [data]);
 
-  return userData;
+  return results;
 }
 
-export function useUpdate(dataUser) {
-  const [user, setUser] = useRecoilState(userDataState);
-  const update = useRecoilValue(userUpdate);
+export function useAuthToken(data) {
+  const [token, setToken] = useAtom(tokenAtom);
+  const results = useAtomValue(tokenDerived);
 
   useEffect(() => {
-    if (dataUser && dataUser !== user) {
-      setUser(dataUser);
+    if (data && !isequal(data, token)) {
+      setToken(() => ({
+        ...data,
+      }));
     }
-  }, [dataUser]);
-
-  return update;
-}
-
-export function useUpdatePassword(dataUser) {
-  const [user, setUser] = useRecoilState(userDataState);
-  const update = useRecoilValue(userUpdatePassword);
-
-  useEffect(() => {
-    if (dataUser && dataUser !== user) {
-      setUser(dataUser);
-    }
-  }, [user]);
-
-  return update;
-}
-
-export function useAuthToken(dataUser) {
-  const [user, setUser] = useRecoilState(userDataState);
-  const token = useRecoilValue(userAuthToken);
-
-  useEffect(() => {
-    if (dataUser && dataUser !== user) {
-      setUser(dataUser);
-    }
-  }, [user]);
-
-  return token;
-}
-
-export function useLogin(userData) {
-  const [user, setUser] = useRecoilState(userDataState);
-  const myUserData = useRecoilValue(userLogin);
-
-  useEffect(() => {
-    if (userData && userData !== user) {
-      setUser(userData);
-    }
-  }, [user]);
-
-  return myUserData;
-}
-
-export function useMascotasCercas(data) {
-  const [pet, setPet] = useRecoilState(userDataState);
-  const results = useRecoilValue(mascotasCercas);
-
-  useEffect(() => {
-    if (data && data !== pet) {
-      setPet(data);
-    }
-  }, [pet]);
+  }, [data]);
 
   return results;
+}
+
+export function useUpdateUser() {
+  const setData = useSetAtom(userDataAtom);
+  const result = useAtomValue(updateDerived);
+
+  const setUpdate = (data) => {
+    setData(data);
+  };
+
+  return { setUpdate, result };
+}
+
+export function useUpdatePassword() {
+  const setData = useSetAtom(userDataAtom);
+  const result = useAtomValue(updatePassDerived);
+
+  const setUpdate = (data) => {
+    setData(data);
+  };
+
+  return { setUpdate, result };
+}
+
+export function useRecoveryPassword() {
+  const setData = useSetAtom(tokenAtom);
+  const result = useAtomValue(recoveryPassword);
+
+  const setEmail = (email) => {
+    setData(email);
+  };
+
+  return { setEmail, result };
+}
+
+export function useResetPassword() {
+  const setData = useSetAtom(tokenAtom);
+  const response = useAtomValue(resetPassword);
+  const setTokenPassword = (data) => {
+    setData(data);
+  };
+
+  return { setTokenPassword, response };
 }

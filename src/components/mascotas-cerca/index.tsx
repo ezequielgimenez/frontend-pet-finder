@@ -1,160 +1,130 @@
 import React, { useEffect, useState } from "react";
-import * as style from "./index.module.css";
+import style from "./index.module.css";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { toast, ToastContainer } from "react-toastify";
 
 //ui
 import { Card } from "ui/card";
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-// states
-import { userDataState } from "lib/state-manager-user";
-import { userDataReport } from "lib/state-manager-user-report";
-import { getEmailReport } from "lib/state-manager-user-report";
-import { useMascotasCercas } from "hooks/auth-hooks";
-
-//hooks info report
-import { useReportPet } from "hooks/reports-hooks";
-import { useSendInfoReport } from "hooks/reports-hooks";
-import { useGetEmail } from "hooks/reports-hooks";
+import { usePetAround, useCreateInformant } from "hooks/pet-hooks";
 
 export function MascotasCercas() {
   const navigate = useNavigate();
-  //user storage
-  const storage = JSON.parse(sessionStorage.getItem("user"));
-
-  //states manager
-  const [user, setUser] = useRecoilState(userDataState);
-  const [reportData, setReportData] = useRecoilState(userDataReport);
-  const [id, setId] = useRecoilState(getEmailReport);
-
-  // resultados de custom hooks
-  const responseEmail = useGetEmail(id);
-  const petReport = useReportPet(reportData);
-  const sendInfo = useSendInfoReport(reportData);
-
-  //states of components
   const [showForm, setShowForm] = useState(false);
-  const results = useMascotasCercas(user);
-  const [mascotas, setMascotas] = useState([]);
-  const [showCard, setShowCard] = useState(false);
-  const [namePet, setNamePet] = useState("");
-  const [email, setEmail] = useState("");
+  const [infoPet, setInfoPet] = useState(null);
+
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
+  const { setLangLong, results } = usePetAround();
+  const { createInformant, response } = useCreateInformant();
 
   useEffect(() => {
-    if (!storage) {
-      navigate("/signin");
-    } else if (!storage.id) {
-      navigate("/signin");
-    } else if (!storage.lat || !storage.long) {
-      navigate("/mis-datos");
-    }
-  }, []);
+    if (userStorage?.id && userStorage?.lat && userStorage?.long) {
+      setLangLong({
+        userId: userStorage.id,
+        lat: userStorage.lat,
+        long: userStorage.long,
+      });
+    } else {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setLangLong({ lat: latitude, long: longitude });
 
-  useEffect(() => {
-    if (responseEmail) {
-      if (responseEmail.success) {
-        const email = responseEmail.data.email;
-        setEmail(email);
-      }
-    }
-  }, [responseEmail]);
-
-  useEffect(() => {
-    const storage = JSON.parse(sessionStorage.getItem("user"));
-    if (storage && storage.lat && storage.long) {
-      setUser((prevUser) => ({
-        ...prevUser,
-        lat: storage.lat,
-        long: storage.long,
-      }));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (results) {
-      if (results.success) {
-        setMascotas(results.data);
-        setShowCard(true);
-      }
-    }
-  }, [results]);
-
-  useEffect(() => {
-    if (petReport && sendInfo) {
-      if (petReport.success && sendInfo.success) {
-        navigate("/send-success");
+            sessionStorage.setItem(
+              "user",
+              JSON.stringify({
+                ...userStorage,
+                lat: latitude,
+                long: longitude,
+              })
+            );
+          },
+          (error) => {
+            toast.error(error.message);
+          }
+        );
       } else {
-        navigate("/send-error");
+        toast.error("Geolocation is not supported by this browser.");
       }
     }
-  }, [petReport, sendInfo]);
+  }, []);
+
+  useEffect(() => {
+    if (response && response.success) {
+      toast.success(response.message, {
+        autoClose: 3000,
+      });
+      setShowForm(false);
+    }
+  }, [response]);
 
   const handleShowForm = () => {
     setShowForm(!showForm);
   };
 
-  const handleCardClick = (id, namePet) => {
-    setShowForm(!showForm);
-    setNamePet(namePet);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    console.log(`Clicked Card with ID: ${id} and Title: ${namePet}`);
-    setId({
-      idPet: id,
+  const sendDataReport = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const name = form.get("name").toString();
+    const telefono = form.get("telefono").toString();
+    const info = form.get("info").toString();
+
+    createInformant({
+      name,
+      id: infoPet.id,
+      phone: telefono,
+      about: info,
     });
   };
 
-  const sendDataReport = async (e) => {
-    e.preventDefault();
-    const name = e.target.name.value;
-    const telefono = e.target.telefono.value;
-    const info = e.target.info.value;
-
-    setReportData((prevData) => {
-      const newState = {
-        ...prevData,
-        reportName: name,
-        phoneNumber: telefono,
-        moreAbout: info,
-        email,
-        idPet: Number(id.idPet),
-      };
-      console.log("Setie la data:", newState);
-      return newState;
-    });
-    setShowForm(false);
+  const handleClickReport = (id, name) => {
+    if (!userStorage?.id) {
+      toast.error(
+        "Inicia sesión o regístrate para reportar esta mascota 🙏❤️",
+        {
+          autoClose: 1800,
+          onClose: () => navigate("/"),
+        }
+      );
+    } else {
+      setShowForm(!showForm);
+      setInfoPet({ id, name });
+    }
   };
 
   return (
     <div className={style.mainContent}>
-      <h1>Mascotas perdidas cerca</h1>
-      <div className={`${showCard ? style.cardOn : style.cardOff}`}>
-        {mascotas && mascotas.length > 0 ? (
-          mascotas.map((item) => (
-            <div className={style.contentCard} key={item.objectID}>
-              <Card
-                id={item.objectID}
-                imgSrc={item.petImageUrl}
-                title={item.namePet}
-                description={item.petUbicacion}
-                textButton="Reportar"
-                color="rojo"
-                sendData={handleCardClick}
-              />
-            </div>
-          ))
-        ) : (
-          <div>
-            <p>Aún no hay mascotas perdidas cerca de tu ubicación</p>
+      <div>
+        <div>
+          {results?.data ? (
+            results?.data.map((item) => (
+              <div className={style.contentCard} key={item.objectID}>
+                <Card
+                  id={item.objectID}
+                  imgSrc={item.imageUrl}
+                  title={item.name}
+                  description={item.ubication}
+                  textButton="Informar sobre esta mascota"
+                  color="rojo"
+                  sendData={() => handleClickReport(item.objectID, item.name)}
+                />
+              </div>
+            ))
+          ) : (
             <div>
-              <img
-                src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1714510371/pet-finder/reports/btgol39wfj7mqzqsxzak.svg"
-                alt=""
-              />
+              <p>Aún no hay mascotas perdidas cerca de tu ubicación</p>
+              <div>
+                <img
+                  src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1714510371/pet-finder/reports/btgol39wfj7mqzqsxzak.svg"
+                  alt=""
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div
@@ -165,7 +135,7 @@ export function MascotasCercas() {
         <div className={style.contentButton}>
           <button onClick={handleShowForm}>✖️</button>
         </div>
-        <h3 className={style.titleReport}>Reportar Info de {namePet} </h3>
+        <h3 className={style.titleReport}>Reportar Info de {infoPet?.name} </h3>
         <form onSubmit={sendDataReport} className={style.mainForm}>
           <div className={style.contentInput}>
             <label htmlFor="">NOMBRE</label>
@@ -184,6 +154,7 @@ export function MascotasCercas() {
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 }

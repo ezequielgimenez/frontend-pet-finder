@@ -1,66 +1,87 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import isequal from "lodash.isequal";
 
-//state pet manager // atom
-import { petDataState } from "lib/state-manager-pets";
-import { queryState } from "lib/state-manager-pets";
-import { deleteState } from "lib/state-manager-pets";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
-//selectors
-import { createPet } from "lib/state-manager-pets";
-import { myPetsReport } from "lib/state-manager-pets";
-import { EditReport } from "lib/state-manager-pets";
-import { deleteReport } from "lib/state-manager-pets";
+import {
+  //atoms
+  petAtom,
+  userIdAtom,
+  petAtomId,
+  informantAtom,
+  //atoms derived
+  createPetDerived,
+  myPetsDerived,
+  deletePet,
+  updatePet,
+  petAround,
+  informantReport,
+} from "lib/atom-pets";
 
 export function useCreatePet(petData) {
-  const [pet, setPet] = useRecoilState(petDataState);
-  const result = useRecoilValue(createPet);
+  const [pet, setPet] = useAtom(petAtom);
+  const results = useAtomValue(createPetDerived);
 
   useEffect(() => {
-    if (petData && petData !== pet) {
+    if (petData && !isequal(petData, pet)) {
       setPet(petData);
     }
-  }, [pet]);
+  }, [petData]);
 
-  return result;
+  return results;
 }
 
-export function useGetMyPets() {
-  const [userId, setUserId] = useRecoilState(queryState);
-  const result = useRecoilValue(myPetsReport);
+export function useGetMyPets(petData) {
+  const [pet, setPet] = useAtom(userIdAtom);
+  const results = useAtomValue(myPetsDerived);
 
   useEffect(() => {
-    if (userId) {
-      setUserId(userId);
+    if (petData && !isequal(petData, pet)) {
+      setPet(petData);
     }
-  }, [userId]);
+  }, [petData]);
 
-  return result;
+  return results;
 }
 
-export function useEditReport(update) {
-  const [pet, setPet] = useRecoilState(petDataState);
-  const result = useRecoilValue(EditReport);
+export function useUpdatePet() {
+  const setPet = useSetAtom(petAtom);
+  const responseUpdate = useAtomValue(updatePet);
 
-  useEffect(() => {
-    if (update && update !== pet) {
-      setPet(update);
-    }
-  }, [pet]);
+  const update = (petData) => {
+    setPet(petData);
+  };
 
-  return result;
+  return { update, responseUpdate };
 }
 
-export function useDeleteReport(id) {
-  const [idPet, setIdPet] = useRecoilState(deleteState);
-  const result = useRecoilValue(deleteReport);
+export function useDeletePet() {
+  const setPet = useSetAtom(petAtomId);
+  const responseDelete = useAtomValue(deletePet);
 
-  useEffect(() => {
-    if (id && id !== idPet) {
-      setIdPet(idPet);
-    }
-  }, [idPet]);
+  const eliminate = (data) => {
+    setPet(data);
+  };
+  return { eliminate, responseDelete };
+}
 
-  return result;
+export function usePetAround() {
+  const setPet = useSetAtom(petAtom);
+  const results = useAtomValue(petAround);
+
+  const setLangLong = (data) => {
+    setPet(data);
+  };
+  return { setLangLong, results };
+}
+
+export function useCreateInformant() {
+  const setInfo = useSetAtom(informantAtom);
+  const response = useAtomValue(informantReport);
+
+  const createInformant = (data) => {
+    setInfo(data);
+  };
+  return { createInformant, response };
 }

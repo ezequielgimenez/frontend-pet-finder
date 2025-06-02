@@ -13,7 +13,7 @@
 .contentInput {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin: 25px 0;
 }
 
 .contentInput label {
@@ -37,6 +37,7 @@
 }
 
 .contentButton {
+  max-width: 500px;
   margin: 20px 0;
 }
 

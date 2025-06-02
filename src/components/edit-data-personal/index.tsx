@@ -1,79 +1,62 @@
 import React, { useEffect, useState } from "react";
-import * as style from "./index.module.css";
-import { useRecoilState } from "recoil";
+import style from "./index.module.css";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 //ui
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-//state registro user atom
-import { userDataState } from "lib/state-manager-user";
-//hooks
-import { useUpdate } from "hooks/auth-hooks";
-//fetch long lat
 import { setLongLat } from "lib/data-fetchs";
+import { useUpdateUser } from "hooks/auth-hooks";
 
 export function EditData() {
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
+  const { setUpdate, result } = useUpdateUser();
 
-  // // Traer la data del sessionStorage que tiene data de la DB y id
-
-  let storage = JSON.parse(sessionStorage.getItem("user"));
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
   useEffect(() => {
-    if (!storage) {
-      navigate("/signin");
-    } else if (!storage.id) {
-      navigate("/signin");
+    if (!userStorage?.id) {
+      navigate("/");
     }
   }, []);
 
-  //uso el recoilState del atom para setear nuevos datos(mi data principal del state)
-  const [user, setDataUser] = useRecoilState(userDataState);
-  const response = useUpdate(user);
-
-  const handleFormData = async (e) => {
+  const handleFormData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fullName = e.target.name.value;
-    const localidad = e.target.localidad.value;
+
+    const formElement = e.currentTarget;
+    const form = new FormData(e.currentTarget);
+    const fullName = form.get("name").toString();
+    const localidad = form.get("localidad").toString();
 
     if (!fullName || !localidad) {
-      alert("Por favor, no dejes campos sin completar.");
+      toast.error("Por favor no dejes campos sin completar");
       return;
     }
-
-    // Obtener latitud y longitud
+    // Obtengo la latitud y longitud
     const result = await setLongLat(localidad);
 
-    // Actualizar estado con fullName, localidad, lat y long
-    setDataUser((prevState) => {
-      const newState = {
-        ...prevState,
-        fullName,
-        userId: storage ? storage.id : "",
-        localidad,
-        lat: result.lat,
-        long: result.long,
-      };
-      return newState;
+    setUpdate({
+      userId: userStorage?.id,
+      fullName,
+      localidad,
+      lat: result.lat,
+      long: result.long,
     });
-
-    e.target.reset();
+    formElement.reset();
   };
 
   useEffect(() => {
-    if (response) {
-      if (response.success) {
-        setMessage(response.message);
-        // Actualizar la variable `storage` después de guardar la nueva data
-        sessionStorage.setItem("user", JSON.stringify(response.data.user));
+    if (result) {
+      if (result.success) {
+        toast.success(result.message);
+        sessionStorage.setItem("user", JSON.stringify(result.data));
       } else {
-        setMessage(response.message);
+        toast.error(result.message);
       }
     }
-  }, [response]);
+  }, [result]);
 
   return (
     <div>
@@ -89,9 +72,9 @@ export function EditData() {
           <label htmlFor="">LOCALIDAD</label>
           <MyInput type="text" name="localidad"></MyInput>
         </div>
-        <div>{message}</div>
         <div>
           <MyButton color="azul">Guardar</MyButton>
+          <ToastContainer />
         </div>
       </form>
     </div>

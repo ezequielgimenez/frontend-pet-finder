@@ -1,5 +1,5 @@
 import React from "react";
-import * as styles from "./card.module.css";
+import styles from "./card.module.css";
 
 type myProps = {
   imgSrc?: string;
@@ -8,15 +8,10 @@ type myProps = {
   description: string;
   color?: string;
   textButton: string;
-  sendData?: (id: number, nombre: string) => void;
+  sendData?: () => void;
 };
 
 export function Card(p: myProps) {
-  function handleData() {
-    if (p.sendData) {
-      p.sendData(p.id, p.title);
-    }
-  }
   return (
     <div className={styles.card}>
       <img src={p.imgSrc} alt="" className={styles.cardImage} />
@@ -25,7 +20,7 @@ export function Card(p: myProps) {
         <p className={styles.cardDescription}>{p.description}</p>
         <button
           className={`${styles.cardButton} ${styles[p.color]}`}
-          onClick={handleData}
+          onClick={p.sendData}
         >
           {p.textButton}
         </button>

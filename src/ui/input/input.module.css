@@ -1,6 +1,7 @@
 .mainInput {
   display: flex;
   flex-grow: 1;
+  position: relative;
 }
 
 .input {
@@ -10,6 +11,22 @@
   border: 2px solid #ccc;
   border-radius: 5px;
   transition: border-color 0.4s ease-in-out;
+}
+
+.mainInput .showButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.showButton:hover {
+  border-radius: 8px;
+  height: 40px;
+  background-color: rgba(241, 233, 233, 0.349);
 }
 
 .input:focus {

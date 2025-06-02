@@ -1,9 +1,4 @@
 .mainContainer {
-  margin-top: 40px;
-  padding: 20px;
-}
-
-.formMain {
   max-width: 500px;
   margin: 0 auto;
   padding: 20px;
@@ -13,7 +8,7 @@
 .contentInput {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 .contentInput label {
@@ -37,6 +32,7 @@
 }
 
 .contentButton {
+  max-width: 500px;
   margin: 20px 0;
 }
 

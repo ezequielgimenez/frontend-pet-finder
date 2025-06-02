@@ -1,80 +1,64 @@
 import React, { useEffect, useState } from "react";
-import * as style from "./index.module.css";
-import { useRecoilState } from "recoil";
+import style from "./index.module.css";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 //ui
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-//state registro user atom
-import { userDataState } from "lib/state-manager-user";
-//hooks
-import { useUpdate } from "hooks/auth-hooks";
+import { useRegister } from "hooks/auth-hooks";
 //fetch long lat
 import { setLongLat } from "lib/data-fetchs";
 
 export function RegisterForm2() {
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
+  const [userData, setUserData] = useState(null);
+  const response = useRegister(userData);
 
-  // // Traer la data del sessionStorage que tiene data de la DB y id
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
+  if (userStorage && userStorage.id) {
+    navigate("/mis-datos");
+  }
 
-  let storage = JSON.parse(sessionStorage.getItem("user"));
-
-  useEffect(() => {
-    if (!storage) {
-      navigate("/signin");
-    } else if (storage.id) {
-      navigate("/mis-datos");
-    }
-  }, []);
-
-  //uso el recoilState del atom para setear nuevos datos(mi data principal del state)
-  const [user, setDataUser] = useRecoilState(userDataState);
-  const response = useUpdate(user);
-
-  const handleFormData = async (e) => {
+  const handleFormData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fullName = e.target.name.value;
-    const localidad = e.target.localidad.value;
+    const formElement = e.currentTarget;
+
+    const form = new FormData(e.currentTarget);
+    const fullName = form.get("name").toString();
+    const localidad = form.get("localidad").toString();
 
     if (!fullName || !localidad) {
-      alert("Por favor, no dejes campos sin completar.");
+      toast.error("Por favor, no dejes campos sin completar.");
       return;
     }
-
-    // Obtener latitud y longitud
-    const result = await setLongLat(localidad);
-
-    // Actualizar estado con fullName, localidad, lat y long
-    setDataUser((prevState) => {
-      const newState = {
-        ...prevState,
+    // obtengo latitud y longitud
+    const { lat, long } = await setLongLat(localidad);
+    if (lat && long) {
+      setUserData({
         fullName,
-        userId: storage ? storage.id : "",
         localidad,
-        lat: result.lat,
-        long: result.long,
-      };
-      return newState;
-    });
-
-    e.target.reset();
+        lat,
+        long,
+      });
+    }
+    formElement.reset();
   };
 
   useEffect(() => {
     if (response) {
       if (response.success) {
-        setMessage(response.message);
-
-        sessionStorage.setItem("user", JSON.stringify(response.data.user));
-
-        setTimeout(() => {
-          navigate("/mascotas-cerca");
-        }, 3000);
+        sessionStorage.setItem("user", JSON.stringify(response.data));
+        toast.success(response.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/mascotas-cerca"),
+        });
       } else {
-        setMessage(response.message);
+        toast.error(response.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/signup"),
+        });
       }
     }
   }, [response]);
@@ -94,10 +78,10 @@ export function RegisterForm2() {
           <label htmlFor="">LOCALIDAD</label>
           <MyInput type="text" name="localidad"></MyInput>
         </div>
-        <div>{message}</div>
         <div>
           <MyButton color="azul">Guardar</MyButton>
         </div>
+        <ToastContainer />
       </form>
     </div>
   );

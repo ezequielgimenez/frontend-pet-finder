@@ -4,21 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import { MyButton } from "ui/button/button";
 
-import { useRegister } from "hooks/auth-hooks";
-import { userDataState } from "lib/state-manager-user";
-import { useRecoilState } from "recoil";
-
 export function MisDatos() {
-  let user;
   const navigate = useNavigate();
-  const dataUser = sessionStorage.getItem("user");
 
-  try {
-    user = dataUser ? JSON.parse(dataUser) : {};
-  } catch (error) {
-    user = {};
-  }
-  const [userD, setDataUser] = useRecoilState(userDataState);
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
   const handleCerrarSesion = () => {
     sessionStorage.clear();
@@ -55,7 +44,9 @@ export function MisDatos() {
         </div>
         <div className={style.sesion}>
           <div>
-            <label htmlFor="email">{user.email}</label>
+            <label htmlFor="email">
+              {userStorage?.email ? userStorage.email : ""}
+            </label>
           </div>
           <div>
             <a onClick={handleCerrarSesion} href="">

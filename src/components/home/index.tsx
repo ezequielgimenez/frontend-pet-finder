@@ -1,45 +1,32 @@
 // SEO
 import { Helmet } from "react-helmet";
-
 import React, { useEffect, useState } from "react";
-import * as style from "./index.module.css";
-import { animateScroll as scroll } from "react-scroll";
-import { useRecoilState } from "recoil";
+import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
+import style from "./index.module.css";
 import { MyButton } from "ui/button/button";
 
-import { userDataState } from "lib/state-manager-user";
-import { useNavigate } from "react-router-dom";
+import { useSetAtom } from "jotai";
+import { userDataAtom } from "lib/atom-auth-user";
 
 export function HomeComponent() {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
-  const [user, setDataUser] = useRecoilState(userDataState);
+  const setUser = useSetAtom(userDataAtom);
 
   const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
   // Preload de la imagen LCP
   useEffect(() => {
+    if (userStorage?.id) {
+      navigate("/mis-datos");
+    }
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
     link.href =
       "https://res.cloudinary.com/dkzmrfgus/image/upload/v1720134084/Pet%20Finder%20React/Home/ht11bmmsuwlv2z4frftu.svg";
     document.head.appendChild(link);
-  }, []);
-
-  useEffect(() => {
-    if (userStorage && userStorage.id) {
-      navigate("/mis-datos");
-    }
-  }, []);
-
-  useEffect(() => {
-    scroll.scrollToBottom({
-      duration: 800, // Duración del desplazamiento en milisegundos
-      delay: 0, // Retraso antes de iniciar el desplazamiento en milisegundos
-      smooth: "easeInOutQuart", // Tipo de transición suave
-    });
   }, []);
 
   const handleSignup = (e) => {
@@ -62,24 +49,17 @@ export function HomeComponent() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setDataUser((prevData) => {
-            const newState = {
-              ...prevData,
-              lat: latitude,
-              long: longitude,
-            };
-
-            return newState;
-          });
-
-          setError(null);
+          sessionStorage.setItem(
+            "user",
+            JSON.stringify({ lat: latitude, long: longitude })
+          );
         },
         (error) => {
-          setError(error.message);
+          toast.error(error.message);
         }
       );
     } else {
-      setError("Geolocation is not supported by this browser.");
+      toast.error("Geolocation is not supported by this browser.");
     }
   };
 
@@ -88,18 +68,20 @@ export function HomeComponent() {
       <Helmet>
         <title>Pet Finder - Home</title>
         <meta
-          name="description"
+          name="Home"
           content="Pet Finder App: Encontrá y reportá mascotas perdidas cerca de tu ubicación."
         />
       </Helmet>
+
       <div className={style.containerMain}>
         <div className={style.containerImg}>
           <img
             className={style.imgHome}
             src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1720134084/Pet%20Finder%20React/Home/ht11bmmsuwlv2z4frftu.svg"
-            alt=""
+            alt="Image-Home"
           />
         </div>
+
         <div className={style.containerTitle}>
           <h1>Pet Finder App</h1>
           <p>Encontrá y reportá mascotas perdidas cerca de tu ubicación</p>
@@ -125,6 +107,7 @@ export function HomeComponent() {
               Iniciar Sesión
             </MyButton>
           </div>
+          <ToastContainer></ToastContainer>
         </div>
       </div>
     </>

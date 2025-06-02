@@ -1,56 +1,48 @@
 import React, { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+
 import { useNavigate } from "react-router-dom";
-import * as style from "./userAuth.module.css";
-import { useRecoilState } from "recoil";
+import style from "./userAuth.module.css";
 
 //ui
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-//state manager email
-import { emailAtom } from "lib/state-auth-email";
-//hooks
+//custom hooks
 import { useEmail } from "hooks/auth-email";
 
 export function UserAuth() {
   const navigate = useNavigate();
-  const [myEmail, setEmail] = useRecoilState(emailAtom);
-  const [messageOk, setMessageOk] = useState("");
-  const [messageError, setMessageError] = useState("");
-
-  const emailResult = useEmail(myEmail);
-  const storage = JSON.parse(sessionStorage.getItem("user"));
-
-  window.scrollTo({
-    top: document.documentElement.scrollHeight,
-    behavior: "smooth",
-  });
+  const { setEmail, result } = useEmail();
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
   useEffect(() => {
-    if (storage && storage.id) {
+    if (userStorage && userStorage?.id) {
       navigate("/mis-datos");
     }
   }, []);
 
   useEffect(() => {
-    if (emailResult) {
-      if (emailResult.success) {
-        setMessageOk(emailResult.message);
+    if (result) {
+      if (result.success) {
+        toast.success(result.message, {
+          autoClose: 2000,
+        });
         setTimeout(() => {
-          navigate("/signIn");
-        }, 3000);
+          navigate("/signin");
+        }, 2000);
       } else {
-        setMessageError(emailResult.message);
+        toast.error(result.message);
       }
     }
-  }, [emailResult]);
+  }, [result]);
 
-  function handleFormData(e) {
+  const handleFormData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const emailValue = e.target.email.value;
-
-    setEmail({ email: emailValue });
-  }
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email").toString();
+    setEmail({ email });
+  };
 
   return (
     <div>
@@ -72,16 +64,17 @@ export function UserAuth() {
             <MyInput type="text" name="email"></MyInput>
           </div>
           <div>
-            <MyButton color="azul">Siguiente</MyButton>
+            <MyButton type="submit" color="azul">
+              Siguiente
+            </MyButton>
           </div>
         </form>
-        <div className={style.messageOk}>{messageOk}</div>
-        <div className={style.messageError}>{messageError}</div>
         <div className={style.contentSesion}>
           <label htmlFor="">
-            Aún no tenes cuenta? <a href="/signUp">Registrate.</a>
+            Aún no tenes cuenta? <a href="/signup">Registrate.</a>
           </label>
         </div>
+        <ToastContainer />
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import * as style from "./index.module.css";
+import { toast } from "react-toastify";
 
+import style from "./index.module.css";
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
@@ -10,7 +10,7 @@ import { MyButton } from "ui/button/button";
 import { useDropzone } from "react-dropzone";
 
 // Mapbox
-import Map, { Marker } from "react-map-gl";
+import Map, { Marker } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // Fetch setLatLong
@@ -18,84 +18,56 @@ import { setLongLat } from "lib/data-fetchs";
 
 //custom hook && atom pet state manager
 import { useCreatePet } from "hooks/pet-hooks";
-import { petDataState } from "lib/state-manager-pets";
 
 export function ReportPet() {
-  const [pet, setPet] = useRecoilState(petDataState);
   const navigate = useNavigate();
+  const [pet, setPet] = useState(null);
   const [imageSrc, setImageSrc] = useState("");
+  const [ubicacion, setUbicacion] = useState(null);
 
-  const [namePet, setNamePet] = useState("");
-  const [location, setLocation] = useState("");
-  const [saved, setSaved] = useState("");
-
-  // Estado para manejar la vista del mapa y marcador
+  // estado para manejar la vista del mapa
   const [viewState, setViewState] = React.useState({
     longitude: -58.381775,
     latitude: -34.603851,
-    zoom: 7,
+    zoom: 10,
   });
 
+  //estado para obtener lat y long q esta marcado en el mapa
   const [markerPosition, setMarkerPosition] = React.useState({
     longitude: -58.381775,
     latitude: -34.603851,
   });
 
-  let userStorage = JSON.parse(sessionStorage.getItem("user"));
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
+
+  useEffect(() => {
+    if (!userStorage?.id) {
+      navigate("/auth");
+    }
+  }, []);
 
   const response = useCreatePet(pet);
 
   useEffect(() => {
-    if (!userStorage) {
-      navigate("/signin");
-    } else if (!userStorage.id) {
-      navigate("/signin");
-    }
-  }, []);
-
-  useEffect(() => {
     if (response) {
       if (response.success) {
+        toast.success(response.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/mis-reportes"),
+        });
         sessionStorage.setItem("pet", JSON.stringify(response.data));
-        navigate("/report-success");
       } else {
-        navigate("/report-error");
+        toast.error(response.message, {
+          autoClose: 2000,
+          onClose: () => navigate("/report-pet"),
+        });
       }
     }
-  });
-
-  const handleSendData = (e) => {
-    e.preventDefault();
-    setPet((prevState) => {
-      const newState = {
-        ...prevState,
-        userId: userStorage ? userStorage.id : 0,
-        namePet,
-        petUbicacion: location,
-        petImageUrl: imageSrc,
-        estadoPet: "perdido",
-        petLat: markerPosition.latitude,
-        petLong: markerPosition.longitude,
-      };
-      return newState;
-    });
-  };
-
-  const handleNameForm = async (e) => {
-    e.preventDefault();
-    const name = e.target.name.value;
-    setSaved("Guardado ✔️");
-    setTimeout(() => {
-      setSaved("");
-    }, 3000);
-
-    setNamePet(name);
-  };
+  }, [response]);
 
   const handleSearchForm = async (e) => {
     e.preventDefault();
-    const ubicacion = e.target.ubicacion.value;
-    setLocation(ubicacion);
+    setUbicacion(ubicacion);
     const data = await setLongLat(ubicacion);
     setViewState({
       longitude: data.long,
@@ -117,7 +89,7 @@ export function ReportPet() {
       ...prevState,
       longitude: lng,
       latitude: lat,
-      zoom: 15, // Ajusta el zoom como desees
+      zoom: 15,
     }));
   };
 
@@ -134,63 +106,101 @@ export function ReportPet() {
   }, []);
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+  const handleFormData = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const name = form.get("name").toString();
+    const ubicacion = form.get("ubicacion").toString();
+    const data = {
+      userId: userStorage.id,
+      name,
+      ubication: ubicacion,
+      state: "perdido",
+      imageUrl: imageSrc,
+      lat: markerPosition.latitude,
+      long: markerPosition.longitude,
+    };
+
+    setPet(data);
+    e.currentTarget.reset();
+  };
+
   return (
-    <div>
-      <div className={style.mainContainer}>
+    <div className={style.mainContainer}>
+      <form onSubmit={handleFormData}>
         <h1>Reportar Mascota</h1>
         <p>
           Ingresá la siguiente información para realizar el reporte de la
           mascota
         </p>
 
-        <div className={style.formMain}>
-          <form onSubmit={handleNameForm}>
-            <div className={style.contentInput}>
-              <label>Nombre de la mascota</label>
-              <MyInput type="text" name="name"></MyInput>
-            </div>
+        <div>
+          <div className={style.contentInput}>
+            <label>Nombre de la mascota</label>
+            <MyInput type="text" name="name"></MyInput>
+          </div>
 
-            <div className={style.contentInput}>
-              <img src="" alt="" />
-              <div>{saved}</div>
-              <MyButton color="azul">Guardar</MyButton>
-            </div>
-          </form>
+          <div className={style.contentInput}>
+            <img src="" alt="" />
+          </div>
 
           <div className="mapa"></div>
 
-          <div {...getRootProps()}>
+          <div
+            {...getRootProps()}
+            style={{
+              border: "2px dashed #999",
+              padding: "20px",
+              textAlign: "center",
+              borderRadius: "10px",
+              backgroundColor: "#f9f9f9",
+              cursor: "pointer",
+              width: "310px",
+              margin: "auto",
+            }}
+          >
             <input {...getInputProps()} />
-            <img
-              className={style.imgDropzone}
-              src={
-                imageSrc ||
-                "https://res.cloudinary.com/dkzmrfgus/image/upload/v1720653028/Pet%20Finder%20React/Load%20Image/kewox0qmz3upro4rhwnq.png"
-              }
-              alt=""
-            />
+            {imageSrc ? (
+              <img className={style.imgDropzone} src={imageSrc} alt="" />
+            ) : (
+              <p>
+                Arrastre una imagen y suelte aquí o haz click y selecciona una
+                (Hasta 10mb)
+              </p>
+            )}
           </div>
-          <form onSubmit={handleSearchForm}>
-            <div className={style.contentInput}>
-              <label>Ubicación Ciudad - Provincia</label>
-              <MyInput type="text" name="ubicacion"></MyInput>
-            </div>
+          <div className={style.contentInput}>
+            <label> Ciudad - Provincia </label>
+            <MyInput
+              type="text"
+              name="ubicacion"
+              onChange={(e) => {
+                setUbicacion(e.target.value);
+              }}
+            ></MyInput>
+          </div>
 
-            <div className={style.contentButton}>
-              <MyButton color="azul">Buscar</MyButton>
-            </div>
-          </form>
+          <div onClick={handleSearchForm} className={style.contentButton}>
+            <MyButton type="button" color="azul">
+              Buscar
+            </MyButton>
+          </div>
+
           <div className={`${style.contentInput} ${style.labelMap}`}>
             <label>Seleccionar un punto en el mapa</label>
           </div>
 
           <Map
-            mapboxAccessToken={import.meta.env.VITE_TOKEN_MAPBOX}
+            mapboxAccessToken="pk.eyJ1IjoiZXplZGV2MzgiLCJhIjoiY2x1eDRnMjBsMGx1ZjJxbzN1cnJkN2QwciJ9.5-j1Rphu38Wo_4eytVJH1A"
             onClick={handleMapClick}
             {...viewState}
             onMove={(evt) => setViewState(evt.viewState)}
             mapStyle="mapbox://styles/mapbox/streets-v9"
-            style={{ maxWidth: 450, height: 400, borderRadius: 15 }}
+            style={{
+              maxWidth: 450,
+              height: 400,
+              borderRadius: 15,
+            }}
           >
             <Marker
               longitude={markerPosition.longitude}
@@ -204,13 +214,13 @@ export function ReportPet() {
             </Marker>
           </Map>
 
-          <div onClick={handleSendData} className={style.contentButton}>
+          <div className={style.contentButton}>
             <MyButton color="verde">Reportar Mascota</MyButton>
           </div>
-          <div className={style.contentButton}>
-            <MyButton color="negro">Cancelar</MyButton>
-          </div>
         </div>
+      </form>
+      <div className={style.contentButton}>
+        <MyButton color="negro">Cancelar</MyButton>
       </div>
     </div>
   );

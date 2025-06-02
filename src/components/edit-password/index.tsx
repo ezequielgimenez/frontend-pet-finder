@@ -1,68 +1,54 @@
 import React, { useEffect, useState } from "react";
-import * as style from "./index.module.css";
-import { useRecoilState } from "recoil";
+import style from "./index.module.css";
+import { toast, ToastContainer } from "react-toastify";
 
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-// state && hooks
-import { userDataState } from "lib/state-manager-user";
-import { useUpdatePassword } from "hooks/auth-hooks";
 import { useNavigate } from "react-router-dom";
+import { useUpdatePassword } from "hooks/auth-hooks";
 
 export function EditPassword() {
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
-  const [messageError, setMessageError] = useState("");
-
   const userStorage = JSON.parse(sessionStorage.getItem("user"));
-
-  // hooks
-  const [user, setUser] = useRecoilState(userDataState);
-  const response = useUpdatePassword(user);
+  const { setUpdate, result } = useUpdatePassword();
 
   useEffect(() => {
-    if (!userStorage) {
-      navigate("/signin");
-    } else if (!userStorage.id) {
-      navigate("/signin");
+    if (!userStorage?.id) {
+      navigate("/");
     }
   }, []);
 
   useEffect(() => {
-    if (response) {
-      if (response.success) {
-        setMessage(response.message);
+    if (result) {
+      if (result.success) {
+        toast.success(result.message);
       } else {
-        setMessageError(response.message);
+        toast.error(result.message);
       }
     }
-  }, [response]);
+  }, [result]);
 
-  const handleFormData = (e) => {
-    setMessage("");
-    setMessageError("");
+  const handleFormData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const passwordActual = e.target.actual.value;
-    const password = e.target.password.value;
-    const confirmPassword = e.target.confirmar.value;
+    const formElement = e.currentTarget;
+    const form = new FormData(e.currentTarget);
+    const passwordActual = form.get("actual").toString();
+    const password = form.get("password").toString();
+    const confirmPassword = form.get("confirmar").toString();
 
     if (!password || !confirmPassword || !passwordActual) {
-      alert("Por favor, no dejes campos sin completar.");
+      toast.error("Por favor no dejes campos sin completar");
       return;
     }
     if (password === confirmPassword) {
-      setUser((prevData) => {
-        const newState = {
-          ...prevData,
-          userId: userStorage && userStorage.id ? userStorage.id : "",
-          password,
-          passwordActual,
-        };
-        return newState;
+      setUpdate({
+        userId: userStorage?.id,
+        password: confirmPassword,
+        passwordActual,
       });
     }
-    e.target.reset();
+    formElement.reset();
   };
   return (
     <div>
@@ -72,21 +58,29 @@ export function EditPassword() {
       <form className={style.form} onSubmit={handleFormData}>
         <div className={style.contentInput}>
           <label htmlFor="">CONTRASEÑA ACTUAL</label>
-          <MyInput type="password" name="actual"></MyInput>
+          <MyInput type="password" name="actual" onShowButton={true}></MyInput>
         </div>
         <div className={style.contentInput}>
           <label htmlFor="">NUEVA CONTRASEÑA</label>
-          <MyInput type="password" name="password"></MyInput>
+          <MyInput
+            type="password"
+            name="password"
+            onShowButton={true}
+          ></MyInput>
         </div>
         <div className={style.contentInput}>
           <label htmlFor="">CONFIRMAR CONTRASEÑA</label>
-          <MyInput type="password" name="confirmar"></MyInput>
+          <MyInput
+            type="password"
+            name="confirmar"
+            onShowButton={true}
+          ></MyInput>
         </div>
         <div>
           <MyButton color="azul">Guardar</MyButton>
         </div>
-        <div className={style.message}>{message}</div>
-        <div className={style.messageError}>{messageError}</div>
+
+        <ToastContainer />
       </form>
     </div>
   );

@@ -1,72 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as style from "./registerForm.module.css";
+import { toast, ToastContainer } from "react-toastify";
+
 // ui
+import style from "./registerForm.module.css";
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-import { useRegister } from "hooks/auth-hooks";
-
-import { userDataState } from "lib/state-manager-user";
-import { useRecoilState } from "recoil";
+import { useSetAtom } from "jotai";
+import { userDataAtom } from "lib/atom-auth-user";
 
 export function RegisterForm() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const setUserData = useSetAtom(userDataAtom);
 
-  const [errorInput, setErrorInput] = useState("");
-  const [errorEmail, setErrorEmail] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [user, setDataUser] = useRecoilState(userDataState);
+  const userStorage = JSON.parse(sessionStorage.getItem("user"));
+  if (userStorage && userStorage.id) {
+    navigate("/mis-datos");
+  }
 
-  window.scrollTo({
-    top: document.documentElement.scrollHeight,
-    behavior: "smooth",
-  });
-
-  //custom hook
-  const respuesta = useRegister(user);
-
-  useEffect(() => {
-    if (respuesta) {
-      if (respuesta.success) {
-        setSuccessMessage(respuesta.message);
-        setErrorEmail("");
-
-        sessionStorage.setItem("user", JSON.stringify(respuesta.data.user));
-
-        setTimeout(() => {
-          navigate("/signup/step-two");
-        }, 2000);
-      } else {
-        setErrorEmail(respuesta.message);
-        setSuccessMessage("");
-      }
-    }
-  }, [respuesta]);
-
-  function handleDataForm(e) {
-    setErrorInput("");
+  function handleDataForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-    const passwordConfirm = e.target.passwordConfirm.value;
+    const formElement = e.currentTarget;
 
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email").toString();
+    const password = form.get("password").toString();
+    const passwordConfirm = form.get("passwordConfirm");
     if (!password || !passwordConfirm || !email) {
-      setErrorInput("Hay campos sin completar");
-    } else if (password !== passwordConfirm) {
-      setErrorInput("Las contraseñas no coinciden");
-    } else {
-      setDataUser(() => {
-        const newState = {
-          ...user,
-          email,
-          password,
-        };
-
-        return newState;
-      });
+      toast.error("No dejes campos sin completar");
     }
-    e.target.reset();
+    if (password !== passwordConfirm) {
+      toast.error("Las contraseñas no coinciden");
+    } else {
+      const data = { email, password };
+      setUserData((prev) => ({
+        ...prev,
+        ...data,
+      }));
+      navigate("/signup/step-two");
+    }
+    formElement.reset();
+  }
+
+  function handleShowPass(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.checked) {
+      setShowPassword(true);
+    } else {
+      setShowPassword(false);
+    }
   }
 
   return (
@@ -89,23 +72,37 @@ export function RegisterForm() {
         </div>
         <div className={style.contentInput}>
           <label htmlFor="">CONTRASEÑA</label>
-          <MyInput type="password" name="password"></MyInput>
+          <MyInput
+            type={showPassword ? "text" : "password"}
+            name="password"
+          ></MyInput>
         </div>
         <div className={style.contentInput}>
           <label htmlFor="">CONFIRMAR CONTRASEÑA</label>
-          <MyInput type="password" name="passwordConfirm"></MyInput>
+          <MyInput
+            type={showPassword ? "text" : "password"}
+            name="passwordConfirm"
+          ></MyInput>
         </div>
-        <p className={style.error}>{errorInput}</p>
-        <p className={style.error}>{errorEmail}</p>
-        <p className={style.success}>{successMessage}</p>
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <input
+            style={{ width: "15px", height: "20px" }}
+            onChange={handleShowPass}
+            type="checkbox"
+          />
+          <label style={{ paddingLeft: "15px" }}>Mostrar contraseña</label>
+        </div>
+
         <div className={style.contentSesion}>
           <label htmlFor="">
-            Ya tenes una cuenta? <a href="/signIn">Inicia Sesión</a>{" "}
+            Ya tenes una cuenta? <a href="/signin">Inicia Sesión</a>{" "}
           </label>
         </div>
         <div className={style.containerButton}>
           <MyButton color="azul">Siguiente</MyButton>
         </div>
+        <ToastContainer />
       </form>
     </div>
   );
