@@ -17,13 +17,7 @@
 }
 
 .containerLogo {
-  padding-top: 35px;
   cursor: pointer;
-}
-
-.burger {
-  font-size: 35px;
-  color: white;
 }
 
 .burger:hover {

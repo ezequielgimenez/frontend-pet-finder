@@ -25,7 +25,7 @@ export function MyHeader() {
           <a href="/">
             <img
               className={style.imgHeader}
-              src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1720029351/Pet%20Finder%20React/doarll8qp9gwzkixqcdt.png"
+              src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1748989722/PetFinder-2025/Logo%20pet%20finder%20mobile/logo-pet-finder-mobile_icnjqk.png"
               alt="Logo de Pet Finder"
             />
             <span style={{ display: "none" }}>
@@ -77,7 +77,10 @@ export function MyHeader() {
         <HeaderForFullWindows />
 
         <div className={style.containerImg} onClick={handleShow}>
-          <h4 className={style.burger}>☰</h4>
+          <img
+            style={{ height: "40px" }}
+            src="https://res.cloudinary.com/dkzmrfgus/image/upload/v1748990406/PetFinder-2025/Logo%20pet%20finder%20mobile/burger-bar_xd0jz1.png"
+          />
         </div>
       </header>
       <main>
