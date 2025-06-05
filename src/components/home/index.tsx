@@ -87,7 +87,7 @@ export function HomeComponent() {
           <p>Encontrá y reportá mascotas perdidas cerca de tu ubicación</p>
         </div>
         <div className={style.containerButton}>
-          <div className={style.buttonSelection}>
+          <div className={`${style.buttonSelection} ${style.buttonAuth}`}>
             <MyButton onClick={handleGetLocation} color="azul">
               Dar mi ubicación actual
             </MyButton>
@@ -97,12 +97,12 @@ export function HomeComponent() {
               ¿Cómo funciona Pet Finder?
             </MyButton>
           </div>
-          <div className={`${style.buttonSelection} ${style.buttonAuth}`}>
+          <div className={`${style.buttonSelection} `}>
             <MyButton onClick={handleSignup} color="azul">
               Registrarse
             </MyButton>
           </div>
-          <div className={`${style.buttonSelection} ${style.buttonAuth}`}>
+          <div className={`${style.buttonSelection} `}>
             <MyButton onClick={handleSignin} color="verde">
               Iniciar Sesión
             </MyButton>
