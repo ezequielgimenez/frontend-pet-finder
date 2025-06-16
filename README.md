@@ -12,12 +12,12 @@
   - [Sequelize](https://sequelize.org/) - ORM para manejar la base de datos de postgreSql.
 
 - **Base de Datos**:
-  - [Neon Tech]([https://railway.app](https://neon.com/)/) - Plataforma para desplegar y gestionar bases de datos SQL.
+  - [Neon Tech](https://neon.com/) - Plataforma para desplegar y gestionar bases de datos SQL.
 
 
 - **Servicios de Hosting**:
   - [Firebase Hosting](https://firebase.google.com/products/hosting) - Hosting para la web app frontend.
-  - [Render](https://render.com/) - Despliegue del backend Express.
+  - [Railway](https://render.com/) - Despliegue del backend.
 
 
 - **Herramientas de Desarrollo**:
