@@ -7,8 +7,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 //atom y derivados
 import {
   userDataAtom,
-  userAtomLogin,
-  tokenAtom,
+
   //derivados
   registerDerived,
   loginDerived,
@@ -36,7 +35,7 @@ export function useRegister(userData) {
 }
 
 export function useLogin(data) {
-  const [emailPassword, setEmailPassword] = useAtom(userAtomLogin);
+  const [emailPassword, setEmailPassword] = useAtom(userDataAtom);
   const results = useAtomValue(loginDerived);
 
   useEffect(() => {
@@ -49,7 +48,7 @@ export function useLogin(data) {
 }
 
 export function useAuthToken(data) {
-  const [token, setToken] = useAtom(tokenAtom);
+  const [token, setToken] = useAtom(userDataAtom);
   const results = useAtomValue(tokenDerived);
 
   useEffect(() => {
@@ -86,7 +85,7 @@ export function useUpdatePassword() {
 }
 
 export function useRecoveryPassword() {
-  const setData = useSetAtom(tokenAtom);
+  const setData = useSetAtom(userDataAtom);
   const result = useAtomValue(recoveryPassword);
 
   const setEmail = (email) => {
@@ -97,7 +96,7 @@ export function useRecoveryPassword() {
 }
 
 export function useResetPassword() {
-  const setData = useSetAtom(tokenAtom);
+  const setData = useSetAtom(userDataAtom);
   const response = useAtomValue(resetPassword);
   const setTokenPassword = (data) => {
     setData(data);

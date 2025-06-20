@@ -11,17 +11,7 @@ export const userDataAtom = atom({
   localidad: "",
   lat: 0,
   long: 0,
-});
-
-export const userAtomLogin = atom({
-  email: "",
-  password: "",
-});
-
-export const tokenAtom = atom({
-  email: "",
   token: "",
-  password: "",
 });
 
 export const registerDerived = atom(async (get) => {
@@ -52,7 +42,7 @@ export const registerDerived = atom(async (get) => {
 });
 
 export const loginDerived = atom(async (get) => {
-  const data = get(userAtomLogin);
+  const data = get(userDataAtom);
   const { email, password } = data;
   if (email && password) {
     try {
@@ -75,7 +65,7 @@ export const loginDerived = atom(async (get) => {
 });
 
 export const tokenDerived = atom(async (get) => {
-  const data = get(tokenAtom);
+  const data = get(userDataAtom);
   const { token } = data;
   if (token) {
     try {
@@ -130,6 +120,7 @@ export const updatePassDerived = atom(async (get) => {
         method: "put",
         headers: {
           "content-type": "application/json",
+          Authorization: `bearer {$}`,
         },
         body: JSON.stringify({
           userId,
@@ -149,7 +140,7 @@ export const updatePassDerived = atom(async (get) => {
 });
 
 export const recoveryPassword = atom(async (get) => {
-  const data = get(tokenAtom);
+  const data = get(userDataAtom);
   const { email } = data;
   if (email) {
     try {
@@ -174,7 +165,7 @@ export const recoveryPassword = atom(async (get) => {
 });
 
 export const resetPassword = atom(async (get) => {
-  const data = get(tokenAtom);
+  const data = get(userDataAtom);
   const { token, password } = data;
   if (token && password) {
     try {
