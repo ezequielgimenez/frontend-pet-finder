@@ -30,6 +30,11 @@ export function LoginForm() {
     if (response) {
       if (response.success) {
         setToken({ token: response.token });
+        sessionStorage.setItem(
+          "user",
+          JSON.stringify({ token: response.token })
+        );
+
         toast.success(response.message, {
           autoClose: 2000,
         });
@@ -44,7 +49,9 @@ export function LoginForm() {
   useEffect(() => {
     if (userAuth) {
       if (userAuth.success) {
-        sessionStorage.setItem("user", JSON.stringify(userAuth.data));
+        const tokenStorage = JSON.parse(sessionStorage.getItem("user"));
+        const dataUser = { ...tokenStorage, ...userAuth.data };
+        sessionStorage.setItem("user", JSON.stringify(dataUser));
         toast.success(userAuth.message, {
           autoClose: 2000,
           onClose: () => navigate("/mis-datos"),

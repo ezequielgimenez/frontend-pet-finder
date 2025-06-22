@@ -42,7 +42,7 @@ export function EditReportPet() {
   });
 
   useEffect(() => {
-    if (!userStorage.id && !petStorage.id) {
+    if (!userStorage?.id && !petStorage?.id) {
       navigate("/signin");
     }
     return () => {
@@ -167,7 +167,7 @@ export function EditReportPet() {
       const reader = new FileReader();
       reader.onload = () => {
         if (typeof reader.result === "string") {
-          setImageSrc(reader.result); // Actualizamos el estado con la URL de la imagen
+          setImageSrc(reader.result); // Actualizo el estado con la URL de la imagen
         }
       };
       reader.readAsDataURL(file); // Lee el archivo como una URL
@@ -253,10 +253,13 @@ export function EditReportPet() {
             </Marker>
           </Map>
 
-          <div onClick={() => {}} className={style.contentButton}>
-            <MyButton color="azul">Guardar</MyButton>
+          <div className={style.contentButton}>
+            <MyButton type="submit" color="azul">
+              Guardar
+            </MyButton>
           </div>
         </form>
+
         <div className={style.contentButton}>
           <MyButton type="button" onClick={handleDeleteConfirm} color="rojo">
             Eliminar reporte

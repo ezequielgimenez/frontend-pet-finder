@@ -43,9 +43,8 @@ export function EditPassword() {
     }
     if (password === confirmPassword) {
       setUpdate({
-        userId: userStorage?.id,
-        password: confirmPassword,
-        passwordActual,
+        password: passwordActual,
+        passwordNueva: confirmPassword,
       });
     }
     formElement.reset();

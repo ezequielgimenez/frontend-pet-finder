@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
 import isequal from "lodash.isequal";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -7,8 +6,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   //atoms
   petAtom,
-  userIdAtom,
-  petAtomId,
+  petAtomIdDeleted,
   informantAtom,
   //atoms derived
   createPetDerived,
@@ -33,7 +31,7 @@ export function useCreatePet(petData) {
 }
 
 export function useGetMyPets(petData) {
-  const [pet, setPet] = useAtom(userIdAtom);
+  const [pet, setPet] = useAtom(petAtom);
   const results = useAtomValue(myPetsDerived);
 
   useEffect(() => {
@@ -57,7 +55,7 @@ export function useUpdatePet() {
 }
 
 export function useDeletePet() {
-  const setPet = useSetAtom(petAtomId);
+  const setPet = useSetAtom(petAtomIdDeleted);
   const responseDelete = useAtomValue(deletePet);
 
   const eliminate = (data) => {

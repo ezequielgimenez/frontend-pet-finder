@@ -17,8 +17,8 @@ export function EditData() {
   const userStorage = JSON.parse(sessionStorage.getItem("user"));
 
   useEffect(() => {
-    if (!userStorage?.id) {
-      navigate("/");
+    if (!userStorage?.token) {
+      navigate("/signin");
     }
   }, []);
 
@@ -38,7 +38,6 @@ export function EditData() {
     const result = await setLongLat(localidad);
 
     setUpdate({
-      userId: userStorage?.id,
       fullName,
       localidad,
       lat: result.lat,
@@ -51,7 +50,9 @@ export function EditData() {
     if (result) {
       if (result.success) {
         toast.success(result.message);
-        sessionStorage.setItem("user", JSON.stringify(result.data));
+        const storage = JSON.parse(sessionStorage.getItem("user"));
+        const joinData = { ...storage, ...result.data };
+        sessionStorage.setItem("user", JSON.stringify(joinData));
       } else {
         toast.error(result.message);
       }

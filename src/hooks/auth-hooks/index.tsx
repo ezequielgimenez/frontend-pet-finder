@@ -1,12 +1,37 @@
 import React, { useEffect } from "react";
 import isequal from "lodash.isequal";
-
 //hooks atom
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+
+type ResponseDB = {
+  success: boolean;
+  message: string;
+  token?: string;
+  data?: {
+    fullName: string;
+    email: string;
+    localidad: string;
+    lat: number;
+    long: number;
+  };
+};
+
+type RegisterEmailPassword = {
+  email?: string;
+  password: string;
+  passwordNueva?: string;
+};
+
+type InputDataBasic = UserState & RegisterEmailPassword;
 
 //atom y derivados
 import {
   userDataAtom,
+  passwordAtom,
+  userNewData,
+
+  //importo tambien el type de mi estadito
+  UserState,
 
   //derivados
   registerDerived,
@@ -18,36 +43,41 @@ import {
   resetPassword,
 } from "lib/atom-auth-user";
 
-export function useRegister(userData) {
+export function useRegister(userData: InputDataBasic): ResponseDB {
   const [user, setUser] = useAtom(userDataAtom);
+  const setPassword = useSetAtom(passwordAtom);
   const results = useAtomValue(registerDerived);
 
   useEffect(() => {
     if (userData && !isequal(userData, user)) {
-      setUser((prev) => ({
-        ...prev,
-        ...userData,
-      }));
+      setUser(userData);
+      setPassword({
+        password: userData.password,
+      });
     }
   }, [userData]);
 
   return results;
 }
 
-export function useLogin(data) {
+export function useLogin(userData: InputDataBasic): ResponseDB {
   const [emailPassword, setEmailPassword] = useAtom(userDataAtom);
+  const setPassword = useSetAtom(passwordAtom);
   const results = useAtomValue(loginDerived);
 
   useEffect(() => {
-    if (data && !isequal(data, emailPassword)) {
-      setEmailPassword(data);
+    if (userData && !isequal(userData, emailPassword)) {
+      setEmailPassword(userData);
+      setPassword({
+        password: userData.password,
+      });
     }
-  }, [data]);
+  }, [userData]);
 
   return results;
 }
 
-export function useAuthToken(data) {
+export function useAuthToken(data: InputDataBasic): ResponseDB {
   const [token, setToken] = useAtom(userDataAtom);
   const results = useAtomValue(tokenDerived);
 
@@ -63,10 +93,12 @@ export function useAuthToken(data) {
 }
 
 export function useUpdateUser() {
-  const setData = useSetAtom(userDataAtom);
+  const setData = useSetAtom(userNewData);
   const result = useAtomValue(updateDerived);
 
-  const setUpdate = (data) => {
+  const setUpdate = (
+    data: Pick<UserState, "fullName" | "localidad" | "lat" | "long">
+  ) => {
     setData(data);
   };
 
@@ -74,11 +106,11 @@ export function useUpdateUser() {
 }
 
 export function useUpdatePassword() {
-  const setData = useSetAtom(userDataAtom);
+  const setPassword = useSetAtom(passwordAtom);
   const result = useAtomValue(updatePassDerived);
 
-  const setUpdate = (data) => {
-    setData(data);
+  const setUpdate = (data: RegisterEmailPassword) => {
+    setPassword(data);
   };
 
   return { setUpdate, result };
@@ -97,9 +129,17 @@ export function useRecoveryPassword() {
 
 export function useResetPassword() {
   const setData = useSetAtom(userDataAtom);
+  const setPassword = useSetAtom(passwordAtom);
+
   const response = useAtomValue(resetPassword);
-  const setTokenPassword = (data) => {
-    setData(data);
+
+  const setTokenPassword = (data: InputDataBasic) => {
+    setData({
+      token: data.token,
+    });
+    setPassword({
+      password: data.password,
+    });
   };
 
   return { setTokenPassword, response };

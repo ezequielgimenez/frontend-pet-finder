@@ -7,13 +7,9 @@ import style from "./registerForm.module.css";
 import { MyInput } from "ui/input/input";
 import { MyButton } from "ui/button/button";
 
-import { useSetAtom } from "jotai";
-import { userDataAtom } from "lib/atom-auth-user";
-
 export function RegisterForm() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const setUserData = useSetAtom(userDataAtom);
 
   const userStorage = JSON.parse(sessionStorage.getItem("user"));
   if (userStorage && userStorage.id) {
@@ -35,10 +31,7 @@ export function RegisterForm() {
       toast.error("Las contraseñas no coinciden");
     } else {
       const data = { email, password };
-      setUserData((prev) => ({
-        ...prev,
-        ...data,
-      }));
+      sessionStorage.setItem("registro", JSON.stringify(data));
       navigate("/signup/step-two");
     }
     formElement.reset();

@@ -15,7 +15,6 @@ import { useGetMyPets } from "hooks/pet-hooks";
 export function MyReports() {
   const navigate = useNavigate();
 
-  const [showForm, setShowForm] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [results, setResults] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -41,10 +40,6 @@ export function MyReports() {
       }
     }
   }, [response]);
-
-  const handleShowForm = () => {
-    setShowForm(!showForm);
-  };
 
   const handleCardClick = (id, name) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -95,38 +90,6 @@ export function MyReports() {
               </div>
             ))
           : null}
-      </div>
-
-      <div
-        className={`${style.contentReport} ${
-          showForm ? style.reportOn : style.reportOff
-        }`}
-      >
-        <div className={style.contentButton}>
-          <button onClick={handleShowForm}>✖️</button>
-        </div>
-        <h3 className={style.titleReport}>Reportar Info de </h3>
-        <form className={style.mainForm}>
-          <div className={style.contentInput}>
-            <label htmlFor="">NOMBRE</label>
-            <MyInput type="text" name="name" color="negro" />
-          </div>
-          <div className={style.contentInput}>
-            <label htmlFor="">TELEFONO</label>
-            <MyInput type="text" name="name" color="negro" />
-          </div>
-          <div className={style.contentInput}>
-            <label htmlFor="">¿DONDE LO VISTE?</label>
-            <textarea
-              className={style.myTextArea}
-              name="mascota"
-              id=""
-            ></textarea>
-          </div>
-          <div>
-            <MyButton color="verde">Enviar Información</MyButton>
-          </div>
-        </form>
       </div>
     </div>
   );

@@ -1,13 +1,20 @@
 import React from "react";
-import * as style from "./index.module.css";
+import style from "./index.module.css";
 import { useNavigate } from "react-router-dom";
 
 import { MyButton } from "ui/button/button";
+import { userDataAtom } from "lib/atom-auth-user";
+import { useAtomValue } from "jotai";
 
 export function MisDatos() {
   const navigate = useNavigate();
+  const user = useAtomValue(userDataAtom);
 
-  const userStorage = JSON.parse(sessionStorage.getItem("user"));
+  console.log("user", user);
+
+  if (!user && !user?.id) {
+    navigate("/auth");
+  }
 
   const handleCerrarSesion = () => {
     sessionStorage.clear();
@@ -44,9 +51,7 @@ export function MisDatos() {
         </div>
         <div className={style.sesion}>
           <div>
-            <label htmlFor="email">
-              {userStorage?.email ? userStorage.email : ""}
-            </label>
+            <label htmlFor="email">{user?.email ? user.email : ""}</label>
           </div>
           <div>
             <a onClick={handleCerrarSesion} href="">

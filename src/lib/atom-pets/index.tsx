@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { userDataAtom } from "lib/atom-auth-user";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,11 +14,7 @@ export const petAtom = atom({
   ubication: "",
 });
 
-export const userIdAtom = atom({
-  userId: "",
-});
-
-export const petAtomId = atom({
+export const petAtomIdDeleted = atom({
   id: "",
 });
 
@@ -53,7 +50,7 @@ export const createPetDerived = atom(async (get) => {
 });
 
 export const myPetsDerived = atom(async (get) => {
-  const data = get(userIdAtom);
+  const data = get(petAtom);
   const { userId } = data;
   if (userId) {
     const res = await fetch(API_BASE_URL + `/pet?userId=${userId}`);
@@ -64,50 +61,63 @@ export const myPetsDerived = atom(async (get) => {
 
 export const updatePet = atom(async (get) => {
   const data = get(petAtom);
-  const { id, name, state, imageUrl, lat, long, ubication } = data;
-  if (id) {
-    try {
-      const res = await fetch(API_BASE_URL + "/pet", {
-        method: "put",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          id,
-          name,
-          state,
-          imageUrl,
-          lat,
-          long,
-          ubication,
-        }),
-      });
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      return {
-        success: false,
-        message: "Ocurrio un error al actualizar, inténtalo de nuevo",
-      };
+  const user = get(userDataAtom);
+  if (data && user) {
+    const { token } = user;
+    const { id, name, state, imageUrl, lat, long, ubication } = data;
+
+    if (id && token) {
+      try {
+        const res = await fetch(API_BASE_URL + "/pet", {
+          method: "put",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `bearer ${token}`,
+          },
+          body: JSON.stringify({
+            id,
+            name,
+            state,
+            imageUrl,
+            lat,
+            long,
+            ubication,
+          }),
+        });
+        const data = await res.json();
+        return data;
+      } catch (error) {
+        return {
+          success: false,
+          message: "Ocurrio un error al actualizar, inténtalo de nuevo",
+        };
+      }
     }
   }
 });
 
 export const deletePet = atom(async (get) => {
-  const data = get(petAtomId);
-  const { id } = data;
-  if (id) {
-    try {
-      const res = await fetch(API_BASE_URL + `/pet/${id}`, {
-        method: "delete",
-      });
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      return {
-        success: false,
-        message: "Ocurrio un error, inténtalo de nuevo",
-      };
+  const data = get(petAtomIdDeleted);
+  const user = get(userDataAtom);
+  if (data && user) {
+    const { id } = data;
+    const { token } = user;
+    if (id) {
+      try {
+        const res = await fetch(API_BASE_URL + `/pet/${id}`, {
+          method: "delete",
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        return data;
+      } catch (error) {
+        return {
+          success: false,
+          message: "Ocurrio un error, inténtalo de nuevo",
+        };
+      }
     }
   }
 });

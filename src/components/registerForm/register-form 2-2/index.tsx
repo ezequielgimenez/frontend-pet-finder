@@ -36,7 +36,9 @@ export function RegisterForm2() {
     // obtengo latitud y longitud
     const { lat, long } = await setLongLat(localidad);
     if (lat && long) {
+      const dataProvisoria = JSON.parse(sessionStorage.getItem("registro"));
       setUserData({
+        ...dataProvisoria,
         fullName,
         localidad,
         lat,
